@@ -24,16 +24,33 @@ const SignUp = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    // Validation: Check if any of the required fields is empty
+    if (
+      !values.name ||
+      !values.address ||
+      !values.contact ||
+      !values.email ||
+      !values.password
+    ) {
+      alert("Please fill in all the required fields");
+      return;
+    }
+
     try {
       console.log("Sending data:", values);
       const res = await axios.post("http://localhost:8080/signUp", values);
-      console.log("Response from server:", res.data);
-      alert("You are registered successfully");
-      console.log("User registed successfully");
-      navigate("/");
-      console.log(values);
+
+      if (res.data.message === "User registered successfully") {
+        console.log("User registered successfully");
+        alert("You are registered successfully");
+        navigate("/");
+      } else {
+        console.log("Registration failed: ", res.data.message);
+        alert("Registration failed: " + res.data.message);
+      }
     } catch (err) {
       console.error(err);
+      alert("Please use unique email");
     }
   };
 
