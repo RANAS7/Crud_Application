@@ -19,10 +19,10 @@ const db = mysql.createConnection({
 });
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
+  destination: (_req, _file, cb) => {
     cb(null, "Public/Images");
   },
-  filename: (req, file, cb) => {
+  filename: (_req, file, cb) => {
     cb(
       null,
       file.fieldname + "-" + Date.now() + path.extname(file.originalname)
@@ -37,7 +37,10 @@ app.use("/images", express.static("./public/images/"));
 app.post("/addProduct", upload.array("productImg", 4), (req, res) => {
   const { productName, price, description } = req.body;
   const productImg = req.files
-    ? req.files.map((file) => file.filename).join(",")
+    ? req.files
+        .map((file) => file.filename)
+        .join(",")
+        .replace(/"/g, "")
     : "";
 
   const sql =
@@ -56,7 +59,7 @@ app.post("/addProduct", upload.array("productImg", 4), (req, res) => {
   );
 });
 
-app.get("/getProducts", (req, res) => {
+app.get("/getProducts", (_req, res) => {
   const sql = "SELECT * FROM products";
 
   db.query(sql, (err, results) => {

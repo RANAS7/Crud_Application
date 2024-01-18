@@ -81,7 +81,7 @@ const AddProduct = () => {
           <div className="mb-3 flex flex-row gap-3 items-center">
             <label htmlFor="price">Price</label>
             <input
-              type="text"
+              type="number"
               name="price"
               placeholder="Enter your prics"
               className="form-control"
