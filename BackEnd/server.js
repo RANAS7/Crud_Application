@@ -37,26 +37,19 @@ app.use("/images", express.static("./public/images/"));
 app.post("/addProduct", upload.array("productImg", 4), (req, res) => {
   const { productName, price, description } = req.body;
   const productImg = req.files
-    ? req.files
-        .map((file) => file.filename)
-        .join(",")
-        .replace(/"/g, "")
+    ? req.files.map((file) => file.filename).join(",")
     : "";
 
   const sql =
     "INSERT INTO products (Product_Name, Product_Image, Price, Description) VALUES (?, ?, ?, ?)";
-  db.query(
-    sql,
-    [productName, JSON.stringify(productImg), price, description],
-    (err) => {
-      if (err) {
-        console.error("Database query error: " + err.message);
-        res.status(500).json({ message: "Internal server error" });
-      } else {
-        res.json({ message: "Product added successfully" });
-      }
+  db.query(sql, [productName, productImg, price, description], (err) => {
+    if (err) {
+      console.error("Database query error: " + err.message);
+      res.status(500).json({ message: "Internal server error" });
+    } else {
+      res.json({ message: "Product added successfully" });
     }
-  );
+  });
 });
 
 app.get("/getProducts", (_req, res) => {
