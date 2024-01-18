@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AddProduct = () => {
-  const [images, setImages] = useState(null);
+  const [images, setImages] = useState([]);
 
   const [values, setValues] = useState({
     productName: "",
@@ -17,8 +17,8 @@ const AddProduct = () => {
     const { name, value, files } = event.target;
 
     if (name === "productImg" && files.length > 0) {
-      const file = files[0];
-      setImages(file);
+      const newImages = Array.from(files);
+      setImages((prevImages) => [...prevImages, ...newImages]); // Append new images to existing ones
     }
 
     setValues({
@@ -36,8 +36,9 @@ const AddProduct = () => {
       formData.append("productName", values.productName);
       formData.append("price", values.price);
       formData.append("description", values.description);
-      formData.append("productImg", images);
-
+      images.forEach((image, index) => {
+        formData.append("productImg", image);
+      });
       const res = await axios.post(
         "http://localhost:8080/addProduct",
         formData
@@ -52,12 +53,12 @@ const AddProduct = () => {
       }
     } catch (err) {
       console.log(err);
-      alert("Please check your form");
+      alert("The form is can not submit");
     }
   };
 
   const handleClick = () => {
-    const fileInput = document.getElementById("image-upload-input");
+    const fileInput = document.getElementById("productImg");
     if (fileInput) {
       fileInput.click();
     }
@@ -99,27 +100,32 @@ const AddProduct = () => {
           </div>
 
           <div className="box-decoration">
-            <label htmlFor="image-upload-input" className="image-upload-label">
-              {images ? images.name : "Choose an image"}
-            </label>
-            <div onClick={handleClick} style={{ cursor: "pointer" }}>
-              {images ? (
-                <img
-                  src={URL.createObjectURL(images)}
-                  alt="upload"
-                  className="img-display-after"
-                />
-              ) : (
-                <img
-                  src="./../upload.png"
-                  alt="upload"
-                  className="img-display-before"
-                />
-              )}
+            <label
+              htmlFor="image-upload-input"
+              className="image-upload-label"
+            ></label>
+            <div style={{ cursor: "pointer" }}>
+              <div className="flex flex-row gap-2 items-start">
+                {images.map((Image, index) => (
+                  <img
+                    key={index}
+                    src={URL.createObjectURL(Image)}
+                    alt={`upload-${index}`}
+                    className="img-display-after w-32 h-32 flex mb-3"
+                  />
+                ))}
+              </div>
+              <img
+                src="./../upload.jpg"
+                onClick={handleClick}
+                alt="upload"
+                className="img-display-before"
+              />
 
               <input
-                id="image-upload-input"
+                id="productImg"
                 type="file"
+                accept="image/*"
                 name="productImg"
                 onChange={handleChange}
                 style={{ display: "none" }}

@@ -17,23 +17,27 @@ const Home = () => {
   }, []);
 
   return (
-    <div className=" flex flex-row gap-3">
+    <div className=" block md:flex flex-row gap-3">
       {products.map((product) => (
         <div
-          key={product.id}
-          className="gap-3 bg-slate-400 w-48 text-center rounded-lg "
+          key={product.ID}
+          className="gap-3 block md:flex bg-slate-400 w-48 text-center rounded-lg "
         >
-          <div className=" flex flex-col items-center p-3">
+          <div className="block md:flex flex-col items-center p-3">
             <h3>{product.Product_Name}</h3>
             <p>{product.Price}</p>
             <p>{product.Description}</p>
-            <Link to="/addProduct">
-              <img
-                src={`http://localhost:8080/images/${product.Product_Image}`}
-                alt={product.Product_Name}
-                className="m-1 w-full h-24 rounded-lg"
-              />
-            </Link>
+            <div className=" flex flex-wrap gap-1">
+              {product.Product_Image.split(",").map((image, index) => (
+                <Link to="/addProduct">
+                  <img
+                    src={`http://localhost:8080/images/${image}`}
+                    alt={product.Product_Name}
+                    className="m-1 w-full h-24 rounded-lg"
+                  />
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       ))}

@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     cb(
       null,
-      file.fieldname + "_" + Date.now() + path.extname(file.originalname)
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
     );
   },
 });
@@ -34,20 +34,26 @@ const upload = multer({ storage });
 
 app.use("/images", express.static("./public/images/"));
 
-app.post("/addProduct", upload.single("productImg"), (req, res) => {
+app.post("/addProduct", upload.array("productImg", 4), (req, res) => {
   const { productName, price, description } = req.body;
-  const productImg = req.file.filename;
+  const productImg = req.files
+    ? req.files.map((file) => file.filename).join(",")
+    : "";
 
   const sql =
-    "INSERT INTO products (Product_Name, Product_Image, price, description) VALUES (?, ?, ?, ?)";
-  db.query(sql, [productName, productImg, price, description], (err) => {
-    if (err) {
-      console.error("Database query error: " + err.message);
-      res.status(500).json({ message: "Internal server error" });
-    } else {
-      res.json({ message: "Product added successfully" });
+    "INSERT INTO products (Product_Name, Product_Image, Price, Description) VALUES (?, ?, ?, ?)";
+  db.query(
+    sql,
+    [productName, JSON.stringify(productImg), price, description],
+    (err) => {
+      if (err) {
+        console.error("Database query error: " + err.message);
+        res.status(500).json({ message: "Internal server error" });
+      } else {
+        res.json({ message: "Product added successfully" });
+      }
     }
-  });
+  );
 });
 
 app.get("/getProducts", (req, res) => {
@@ -98,7 +104,7 @@ app.post("/login", (req, res) => {
 
   // Basic validation to check if email and password are provided
   if (!email || !password) {
-    return res.status(400).json("Email and password are required");
+    return res.status(400).json({ message: "Email and password are required" });
   }
 
   const sql = "SELECT * FROM signup WHERE Email = ? AND Password = ?";
@@ -107,11 +113,11 @@ app.post("/login", (req, res) => {
   db.query(sql, values, (err, result) => {
     if (err) {
       console.error(err);
-      return res.status(500).json("Internal Server Error");
+      return res.status(500).json({ message: "Internal Server Error" });
     }
 
     if (result.length > 0) {
-      return res.status("Login successfull");
+      return res.status(200).json({ message: "Login successfull" });
     } else {
       return res.status(401).json("Invalid credentials");
     }
