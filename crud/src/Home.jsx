@@ -32,7 +32,7 @@ const Home = () => {
                 <Link to="/addProduct">
                   <img
                     src={`http://localhost:8080/images/${image}`}
-                    alt={product.Product_Name}
+                    alt={`${product.Product_Name}-${index}`}
                     className="m-1 w-full h-24 rounded-lg"
                   />
                 </Link>
